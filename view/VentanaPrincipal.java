@@ -10,8 +10,8 @@ public class VentanaPrincipal extends JFrame {
 
     public VentanaPrincipal() {
         setTitle("Tetris binario");
-        setSize(850, 550);
-        setMinimumSize(new Dimension(750, 450));
+        setSize(680, 820);
+        setMinimumSize(new Dimension(620, 700));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -40,8 +40,9 @@ public class VentanaPrincipal extends JFrame {
 
     // Inicio temporal mientras se adapta Aplicacion a Swing.
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new VentanaPrincipal().setVisible(true);
-        });
-    }
+    SwingUtilities.invokeLater(() -> {
+        Fuentes.configurar();
+        new VentanaPrincipal().setVisible(true);
+    });
+}
 }

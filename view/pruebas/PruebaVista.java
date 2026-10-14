@@ -7,18 +7,20 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import view.PanelJuego;
+import view.Fuentes;
 
 public class PruebaVista {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
+            Fuentes.configurar();
             JFrame ventana = new JFrame(
                     "Prueba de actualización de la vista"
             );
 
             ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            ventana.setSize(850, 600);
-            ventana.setMinimumSize(new Dimension(750, 500));
+            ventana.setSize(680, 820);
+            ventana.setMinimumSize(new Dimension(620, 700));
 
             PanelJuego juego = new PanelJuego();
 

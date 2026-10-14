@@ -44,7 +44,7 @@ public class PanelJuego extends JPanel {
 
         for (int i = 0; i < casillas.length; i++) {
             casillas[i] = new JLabel("0", SwingConstants.CENTER);
-            casillas[i].setFont(new Font("Monospaced", Font.BOLD, 26));
+            casillas[i].setFont(Fuentes.pixel(24f));
             casillas[i].setForeground(Color.BLACK);
             casillas[i].setOpaque(true);
             casillas[i].setBorder(
@@ -55,7 +55,7 @@ public class PanelJuego extends JPanel {
             filaBits.add(casillas[i]);
         }
 
-        etiquetaObjetivo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        etiquetaObjetivo.setFont(Fuentes.pixel(10f));
         etiquetaObjetivo.setPreferredSize(new Dimension(140, 55));
         etiquetaObjetivo.setBorder(
                 BorderFactory.createLineBorder(Color.GRAY)
