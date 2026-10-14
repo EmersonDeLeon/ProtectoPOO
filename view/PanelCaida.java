@@ -15,9 +15,13 @@ public class PanelCaida extends JPanel {
     private double progreso;
     private boolean bloqueVisible;
 
+    //Define el color del panel
+
     public PanelCaida() {
         setBackground(new Color(30, 40, 55));
     }
+
+    //Muestra el bloque a caer
 
     public void mostrarBloque(int columna, double progreso) {
         if (columna < 0 || columna >= COLUMNAS) {
@@ -88,15 +92,17 @@ public class PanelCaida extends JPanel {
             );
 
             // Dibujar el bloque.
-            dibujo.setColor(new Color(255, 205, 70));
+            // Relleno azul.
+            dibujo.setColor(new Color(45, 110, 220));
             dibujo.fillRect(x, y, lado, lado);
 
-            dibujo.setColor(new Color(170, 100, 15));
+            // Borde azul oscuro.
+            dibujo.setColor(new Color(20, 60, 130));
             dibujo.drawRect(x, y, lado - 1, lado - 1);
 
-            // Dibujar un 1 centrado dentro del bloque.
+            // Numero blanco.
             dibujo.setFont(Fuentes.pixel(20f));
-            dibujo.setColor(Color.BLACK);
+            dibujo.setColor(Color.WHITE);
 
             FontMetrics medidas = dibujo.getFontMetrics();
 
