@@ -13,15 +13,20 @@ public class PanelMenu extends JPanel {
     private final JButton botonJugar = new JButton("Jugar");
 
     public PanelMenu() {
+        //creación del panel
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
+        //titulo
         JLabel titulo = new JLabel("Tetris binario", SwingConstants.CENTER);
-        titulo.setFont(new Font("SansSerif", Font.BOLD, 32));
+        titulo.setFont(Fuentes.pixel(24f));
+        botonJugar.setFont(Fuentes.pixel(12f));
 
+        //espacio para botones
         JPanel zonaBotones = new JPanel();
         zonaBotones.add(botonJugar);
 
+        //posición de los objetos
         add(titulo, BorderLayout.CENTER);
         add(zonaBotones, BorderLayout.SOUTH);
     }
