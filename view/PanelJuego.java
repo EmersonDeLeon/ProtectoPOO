@@ -23,6 +23,7 @@ public class PanelJuego extends JPanel {
     private final JLabel etiquetaPuntuacion = new JLabel();
     private final JLabel etiquetaEstado = new JLabel();
     private final JButton botonVolver = new JButton("Volver al menú");
+    private final PanelCaida zonaCaida = new PanelCaida();
 
     public PanelJuego() {
         setLayout(new BorderLayout(15, 15));
@@ -36,10 +37,7 @@ public class PanelJuego extends JPanel {
         JPanel tablero = new JPanel(new BorderLayout(10, 10));
         tablero.setBorder(BorderFactory.createTitledBorder("Tablero binario"));
 
-        JPanel zonaCaida = new JPanel();
-        zonaCaida.setBackground(new Color(30, 40, 55));
-        tablero.add(zonaCaida, BorderLayout.CENTER);
-
+        
         JPanel filaBits = new JPanel(new GridLayout(1, 8, 5, 0));
 
         for (int i = 0; i < casillas.length; i++) {
@@ -61,11 +59,16 @@ public class PanelJuego extends JPanel {
                 BorderFactory.createLineBorder(Color.GRAY)
         );
 
-        JPanel filaInferior = new JPanel(new BorderLayout(10, 0));
-        filaInferior.add(filaBits, BorderLayout.CENTER);
-        filaInferior.add(etiquetaObjetivo, BorderLayout.EAST);
+        // La zona de caida y las casillas comparten el mismo ancho.
+        JPanel zonaBits = new JPanel(new BorderLayout());
+        zonaBits.add(zonaCaida, BorderLayout.CENTER);
+        zonaBits.add(filaBits, BorderLayout.SOUTH);
+        tablero.add(zonaBits, BorderLayout.CENTER);
 
-        tablero.add(filaInferior, BorderLayout.SOUTH);
+        // El objetivo queda a la derecha de la fila.
+        JPanel columnaObjetivo = new JPanel(new BorderLayout());
+        columnaObjetivo.add(etiquetaObjetivo, BorderLayout.SOUTH);
+        tablero.add(columnaObjetivo, BorderLayout.EAST);
         add(tablero, BorderLayout.CENTER);
 
         JPanel controles = new JPanel(new BorderLayout(10, 0));
@@ -125,6 +128,14 @@ public class PanelJuego extends JPanel {
         etiquetaEstado.setForeground(
                 infectada ? new Color(160, 0, 0) : Color.BLACK
         );
+    }
+
+    public void mostrarBloque(int columna, double progreso) {
+    zonaCaida.mostrarBloque(columna, progreso);
+    }
+
+    public void ocultarBloque() {
+        zonaCaida.ocultarBloque();
     }
 
     public JButton getBotonVolver() {
