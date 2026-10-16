@@ -3,8 +3,9 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -13,116 +14,121 @@ import javax.swing.SwingConstants;
 
 public class PanelJuego extends JPanel {
 
-    private static final Color COLOR_NORMAL = new Color(220, 235, 250);
-    private static final Color COLOR_INFECTADA = new Color(255, 180, 180);
+    // La posición 0 corresponde a la fila superior.
+    private final List<FilaVista> filas = new ArrayList<>();
 
-    // Componentes que podremos actualizar desde otros metodos.
-    private final JLabel[] casillas = new JLabel[8];
-    private final JLabel etiquetaObjetivo =
-            new JLabel("", SwingConstants.CENTER);
+    private final JPanel contenedorFilas =
+            new JPanel(new GridLayout(0, 1, 0, 6));
+
     private final JLabel etiquetaPuntuacion = new JLabel();
     private final JLabel etiquetaEstado = new JLabel();
-    private final JButton botonVolver = new JButton("Volver al menú");
+
+    private final JButton botonVolver =
+            new JButton("Volver al menú");
+
     private final PanelCaida zonaCaida = new PanelCaida();
 
     public PanelJuego() {
         setLayout(new BorderLayout(15, 15));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        JPanel informacion = new JPanel(new BorderLayout());
-        informacion.add(new JLabel("Jugador: Prueba"), BorderLayout.WEST);
-        informacion.add(etiquetaPuntuacion, BorderLayout.EAST);
-        add(informacion, BorderLayout.NORTH);
-
-        JPanel tablero = new JPanel(new BorderLayout(10, 10));
-        tablero.setBorder(BorderFactory.createTitledBorder("Tablero binario"));
-
-        
-        JPanel filaBits = new JPanel(new GridLayout(1, 8, 5, 0));
-
-        for (int i = 0; i < casillas.length; i++) {
-            casillas[i] = new JLabel("0", SwingConstants.CENTER);
-            casillas[i].setFont(Fuentes.pixel(24f));
-            casillas[i].setForeground(Color.BLACK);
-            casillas[i].setOpaque(true);
-            casillas[i].setBorder(
-                    BorderFactory.createLineBorder(Color.GRAY)
-            );
-            casillas[i].setPreferredSize(new Dimension(55, 55));
-
-            filaBits.add(casillas[i]);
-        }
-
-        etiquetaObjetivo.setFont(Fuentes.pixel(10f));
-        etiquetaObjetivo.setPreferredSize(new Dimension(140, 55));
-        etiquetaObjetivo.setBorder(
-                BorderFactory.createLineBorder(Color.GRAY)
+        setBorder(
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)
         );
 
-        // La zona de caida y las casillas comparten el mismo ancho.
-        JPanel zonaBits = new JPanel(new BorderLayout());
-        zonaBits.add(zonaCaida, BorderLayout.CENTER);
-        zonaBits.add(filaBits, BorderLayout.SOUTH);
-        tablero.add(zonaBits, BorderLayout.CENTER);
+        JPanel informacion = new JPanel(new BorderLayout());
+        informacion.add(
+                new JLabel("Jugador: Prueba"),
+                BorderLayout.WEST
+        );
+        informacion.add(etiquetaPuntuacion, BorderLayout.EAST);
 
-        // El objetivo queda a la derecha de la fila.
-        JPanel columnaObjetivo = new JPanel(new BorderLayout());
-        columnaObjetivo.add(etiquetaObjetivo, BorderLayout.SOUTH);
-        tablero.add(columnaObjetivo, BorderLayout.EAST);
+        add(informacion, BorderLayout.NORTH);
+
+        JPanel tablero = new JPanel(new BorderLayout());
+        tablero.setBorder(
+                BorderFactory.createTitledBorder("Tablero binario")
+        );
+
+        // Este espacio mantiene el bloque alineado con las casillas.
+        JPanel zonaSuperior = new JPanel(new BorderLayout(10, 0));
+
+        JPanel espacioObjetivos = new JPanel();
+        espacioObjetivos.setPreferredSize(
+                new Dimension(FilaVista.ANCHO_OBJETIVO, 0)
+        );
+
+        zonaSuperior.add(zonaCaida, BorderLayout.CENTER);
+        zonaSuperior.add(espacioObjetivos, BorderLayout.EAST);
+
+        tablero.add(zonaSuperior, BorderLayout.CENTER);
+        
+        JPanel zonaInferior = new JPanel(new BorderLayout(0, 4));
+
+        zonaInferior.add(contenedorFilas, BorderLayout.CENTER);
+        zonaInferior.add(crearGuiaPotencias(), BorderLayout.SOUTH);
+
+        tablero.add(zonaInferior, BorderLayout.SOUTH);
+
         add(tablero, BorderLayout.CENTER);
 
         JPanel controles = new JPanel(new BorderLayout(10, 0));
-        controles.add(etiquetaEstado, BorderLayout.WEST);
+        controles.add(etiquetaEstado, BorderLayout.CENTER);
         controles.add(botonVolver, BorderLayout.EAST);
+
         add(controles, BorderLayout.SOUTH);
 
-        // Estado inicial de la demostracion.
-        mostrarBits(new int[8]);
-        mostrarObjetivo(5);
+        reiniciarFilas(5);
         mostrarPuntuacion(0);
-        mostrarInfeccion(false);
     }
 
-    // Los bits llegan ordenados de izquierda a derecha.
+    public void agregarFila(int objetivo) {
+
+        // La fila anterior conserva sus bits y su apariencia.
+        if (!filas.isEmpty()) {
+            filas.get(0).setActiva(false);
+        }
+
+        FilaVista nueva = new FilaVista(objetivo);
+        nueva.setActiva(true);
+
+        filas.add(0, nueva);
+        contenedorFilas.add(nueva, 0);
+
+        actualizarEstado();
+        revalidate();
+        repaint();
+    }
+
+    public void reiniciarFilas(int objetivo) {
+        ocultarBloque();
+
+        filas.clear();
+        contenedorFilas.removeAll();
+
+        agregarFila(objetivo);
+    }
+
     public void mostrarBits(int[] bits) {
-        if (bits == null || bits.length != casillas.length) {
-            throw new IllegalArgumentException(
-                    "Se necesitan exactamente 8 bits."
-            );
-        }
-
-        // Comprobar el formato antes de cambiar la pantalla.
-        for (int bit : bits) {
-            if (bit != 0 && bit != 1) {
-                throw new IllegalArgumentException(
-                        "Cada bit debe ser 0 o 1."
-                );
-            }
-        }
-
-        for (int i = 0; i < casillas.length; i++) {
-            casillas[i].setText(String.valueOf(bits[i]));
-        }
+        filas.get(0).mostrarBits(bits);
     }
 
     public void mostrarObjetivo(int numero) {
-        etiquetaObjetivo.setText("Objetivo: " + numero);
+        filas.get(0).mostrarObjetivo(numero);
     }
 
     public void mostrarPuntuacion(int puntos) {
         etiquetaPuntuacion.setText("Puntuación: " + puntos);
     }
 
-    // Representa visualmente el estado que recibe.
     public void mostrarInfeccion(boolean infectada) {
-        Color color = infectada ? COLOR_INFECTADA : COLOR_NORMAL;
+        filas.get(0).mostrarInfeccion(infectada);
+        actualizarEstado();
+    }
 
-        for (JLabel casilla : casillas) {
-            casilla.setBackground(color);
-        }
+    private void actualizarEstado() {
+        boolean infectada = filas.get(0).estaInfectada();
 
-        etiquetaEstado.setText(
-                infectada ? "Fila infectada" : "Fila normal"
+        mostrarEstado(
+                infectada ? "Fila infectada" : "Fila activa"
         );
 
         etiquetaEstado.setForeground(
@@ -130,8 +136,13 @@ public class PanelJuego extends JPanel {
         );
     }
 
+    public void mostrarEstado(String mensaje) {
+        etiquetaEstado.setText(mensaje);
+        etiquetaEstado.setForeground(Color.BLACK);
+    }
+
     public void mostrarBloque(int columna, double progreso) {
-    zonaCaida.mostrarBloque(columna, progreso);
+        zonaCaida.mostrarBloque(columna, progreso);
     }
 
     public void ocultarBloque() {
@@ -141,4 +152,51 @@ public class PanelJuego extends JPanel {
     public JButton getBotonVolver() {
         return botonVolver;
     }
+
+    private JPanel crearGuiaPotencias() {
+    JPanel potencias = new JPanel(new GridLayout(1, 8, 5, 0));
+
+    for (int i = 0; i < 8; i++) {
+        JLabel etiqueta = new JLabel(
+                "<html>2<sup>" + (7 - i) + "</sup></html>",
+                SwingConstants.CENTER
+        );
+
+        etiqueta.setFont(Fuentes.pixel(10f));
+        etiqueta.setPreferredSize(new Dimension(55, 22));
+
+        potencias.add(etiqueta);
+    }
+
+    // Reserva el espacio de los objetivos para alinear las etiquetas.
+    JPanel espacioObjetivos = new JPanel();
+    espacioObjetivos.setPreferredSize(
+            new Dimension(FilaVista.ANCHO_OBJETIVO, 0)
+    );
+
+    JPanel guia = new JPanel(new BorderLayout(10, 0));
+    guia.add(potencias, BorderLayout.CENTER);
+    guia.add(espacioObjetivos, BorderLayout.EAST);
+
+    return guia;
+}
+
+    public void retirarFilaActiva() {
+    if (filas.size() < 2) {
+        throw new IllegalStateException(
+                "No hay una fila anterior para recuperar."
+        );
+    }
+
+    // Elimina la fila completa, incluido su objetivo decimal.
+    FilaVista retirada = filas.remove(0);
+    contenedorFilas.remove(retirada);
+
+    // La fila que estaba debajo pasa a ser la activa.
+    filas.get(0).setActiva(true);
+
+    actualizarEstado();
+    revalidate();
+    repaint();
+}
 }
