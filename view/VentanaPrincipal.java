@@ -8,6 +8,15 @@ import javax.swing.SwingUtilities;
 
 public class VentanaPrincipal extends JFrame {
 
+    private final CardLayout distribucion = new CardLayout();
+    private final JPanel pantallas = new JPanel(distribucion);
+
+    private final PanelMenu menu = new PanelMenu();
+    private final PanelJuego juego = new PanelJuego();
+    private final PanelResultado resultado = new PanelResultado();
+    private final PanelPuntuaciones puntuaciones = new PanelPuntuaciones();
+    private final PanelCreditos creditos = new PanelCreditos();
+
     public VentanaPrincipal() {
         setTitle("Tetris binario");
         setSize(680, 820);
@@ -15,34 +24,71 @@ public class VentanaPrincipal extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // CardLayout muestra un panel a la vez en la misma ventana.
-        CardLayout distribucion = new CardLayout();
-        JPanel pantallas = new JPanel(distribucion);
-
-        PanelMenu menu = new PanelMenu();
-        PanelJuego juego = new PanelJuego();
-
         pantallas.add(menu, "MENU");
         pantallas.add(juego, "JUEGO");
+        pantallas.add(resultado, "RESULTADO");
+        pantallas.add(puntuaciones, "PUNTUACIONES");
+        pantallas.add(creditos, "CREDITOS");
+
         setContentPane(pantallas);
 
-        // Conectar los botones con la navegacion.
-        menu.getBotonJugar().addActionListener(e -> {
-            distribucion.show(pantallas, "JUEGO");
-        });
+        menu.getBotonJugar().addActionListener(e -> mostrarJuego());
+        menu.getBotonPuntuaciones().addActionListener(
+                e -> mostrarPuntuaciones()
+        );
+        menu.getBotonCreditos().addActionListener(e -> mostrarCreditos());
 
-        juego.getBotonVolver().addActionListener(e -> {
-            distribucion.show(pantallas, "MENU");
-        });
+        juego.getBotonVolver().addActionListener(e -> mostrarMenu());
+        resultado.getBotonVolver().addActionListener(e -> mostrarMenu());
+        puntuaciones.getBotonVolver().addActionListener(e -> mostrarMenu());
+        creditos.getBotonVolver().addActionListener(e -> mostrarMenu());
 
+        mostrarMenu();
+    }
+
+    public void mostrarMenu() {
         distribucion.show(pantallas, "MENU");
     }
 
-    // Inicio temporal mientras se adapta Aplicacion a Swing.
+    public void mostrarJuego() {
+        distribucion.show(pantallas, "JUEGO");
+    }
+
+    public void mostrarResultado(int puntuacion) {
+        resultado.prepararResultado(puntuacion);
+        distribucion.show(pantallas, "RESULTADO");
+        resultado.enfocarNombre();
+    }
+
+    public void mostrarPuntuaciones() {
+        distribucion.show(pantallas, "PUNTUACIONES");
+    }
+
+    public void mostrarCreditos() {
+        distribucion.show(pantallas, "CREDITOS");
+    }
+
+    public PanelMenu getPanelMenu() {
+        return menu;
+    }
+
+    public PanelJuego getPanelJuego() {
+        return juego;
+    }
+
+    public PanelResultado getPanelResultado() {
+        return resultado;
+    }
+
+    public PanelPuntuaciones getPanelPuntuaciones() {
+        return puntuaciones;
+    }
+
+    // Inicio temporal mientras se conecta Aplicacion.
     public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> {
-        Fuentes.configurar();
-        new VentanaPrincipal().setVisible(true);
-    });
-}
+        SwingUtilities.invokeLater(() -> {
+            Fuentes.configurar();
+            new VentanaPrincipal().setVisible(true);
+        });
+    }
 }
