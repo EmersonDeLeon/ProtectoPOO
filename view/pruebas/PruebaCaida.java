@@ -16,6 +16,7 @@ import javax.swing.Timer;
 import view.Fuentes;
 import view.PanelJuego;
 
+
 public class PruebaCaida extends JFrame {
 
     private static final int COLUMNA_INICIAL = 5;
@@ -28,6 +29,7 @@ public class PruebaCaida extends JFrame {
 
     private final PanelJuego juego = new PanelJuego();
     private final int[] bits = new int[8];
+    private final boolean[] pistasUsadas = new boolean[3];
 
     private final Timer temporizador;
     private final Timer pausaEntreBloques;
@@ -39,6 +41,7 @@ public class PruebaCaida extends JFrame {
     private double progreso;
     private long inicio;
 
+
     public PruebaCaida() {
         setTitle("Prueba de caída e infección");
         setSize(680, 820);
@@ -49,7 +52,7 @@ public class PruebaCaida extends JFrame {
 
         JPanel controles = new JPanel();
         controles.add(
-                new JLabel("Flechas: izquierda y derecha")
+                controles.add(new JLabel("Izq/der: mover | Abajo: caer"))
         );
         controles.add(reiniciar);
 
@@ -77,6 +80,8 @@ public class PruebaCaida extends JFrame {
 
         configurarTeclas();
 
+        configurarPistas();
+
         juego.getBotonVolver().setText("Cerrar prueba");
         juego.getBotonVolver().addActionListener(e -> dispose());
 
@@ -84,8 +89,25 @@ public class PruebaCaida extends JFrame {
     }
 
     private void configurarTeclas() {
-        registrarTecla("LEFT", "moverIzquierda", -1);
-        registrarTecla("RIGHT", "moverDerecha", 1);
+    registrarTecla("LEFT", "moverIzquierda", -1);
+    registrarTecla("RIGHT", "moverDerecha", 1);
+
+    getRootPane()
+            .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+            .put(
+                    KeyStroke.getKeyStroke("DOWN"),
+                    "caerDirectamente"
+            );
+
+    getRootPane().getActionMap().put(
+            "caerDirectamente",
+            new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    caerDirectamente();
+                }
+            }
+    );
     }
 
     private void registrarTecla(
@@ -126,16 +148,23 @@ public class PruebaCaida extends JFrame {
     }
 
     private void reiniciarPrueba() {
-        detenerTemporizadores();
+    detenerTemporizadores();
 
-        indiceObjetivo = 0;
-        Arrays.fill(bits, 0);
+    indiceObjetivo = 0;
+    Arrays.fill(bits, 0);
 
-        juego.reiniciarFilas(
-                OBJETIVOS_PRUEBA[indiceObjetivo]
-        );
+    juego.reiniciarFilas(
+            OBJETIVOS_PRUEBA[indiceObjetivo]
+    );
+
+    // Recupera las tres pistas al comenzar otra prueba.
+    Arrays.fill(pistasUsadas, false);
+
+    for (int i = 0; i < pistasUsadas.length; i++) {
+        juego.mostrarPistaDisponible(i, true);
+    }
+
         juego.mostrarPuntuacion(0);
-
         crearBloque();
     }
 
@@ -271,5 +300,46 @@ public class PruebaCaida extends JFrame {
             ventana.setVisible(true);
             ventana.reiniciarPrueba();
         });
+    }
+
+    private void configurarPistas() {
+        for (int i = 0; i < pistasUsadas.length; i++) {
+            final int indice = i;
+
+            juego.getBotonPista(i).addActionListener(
+                    e -> usarPista(indice)
+            );
+        }
+    }
+
+    private void usarPista(int indice) {
+
+        // Impide repetir una pista o consumir otra mientras hay una visible.
+        if (pistasUsadas[indice]
+                || !juego.getBotonPista(indice).isEnabled()) {
+            return;
+        }
+
+        pistasUsadas[indice] = true;
+
+        juego.mostrarPistaDisponible(indice, false);
+        juego.mostrarPista(true);
+    }
+
+    private void caerDirectamente() {
+
+    // Durante las pausas no hay un bloque que pueda caer.
+    if (!temporizador.isRunning()) {
+        return;
+    }
+
+    // Detiene la animación y lleva el bloque hasta abajo.
+    temporizador.stop();
+    progreso = 1.0;
+
+    juego.mostrarBloque(columnaActual, progreso);
+
+    // Activa el bit y comprueba si la posición es correcta.
+    aterrizar();
     }
 }

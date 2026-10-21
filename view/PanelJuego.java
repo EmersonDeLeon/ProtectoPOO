@@ -18,28 +18,39 @@ import javax.swing.Timer;
 
 public class PanelJuego extends JPanel {
 
-    // La posición 0 corresponde a la fila superior.
+    //Filas generales
     private final List<FilaVista> filas = new ArrayList<>();
 
     private final JPanel contenedorFilas =
             new JPanel(new GridLayout(0, 1, 0, 6));
 
+    // Valores
     private final JLabel etiquetaPuntuacion = new JLabel();
     private final JLabel etiquetaEstado = new JLabel();
 
+    //Botones de pistas
     private final JButton botonVolver =
             new JButton("Volver al menú");
 
-    private final JButton botonIdea = new JButton("Pista");
-    private final Timer temporizadorPista;
-
-    private final JLabel[] etiquetasPotencias = new JLabel[8];
-
-    private final PanelCaida zonaCaida = new PanelCaida();
+    private final JButton[] botonesPista = new JButton[3];
+    private final boolean[] pistasDisponibles = {
+        true, true, true
+    };
 
     private boolean pistaVisible;
+    
+    private final Timer temporizadorPista;
 
+    //Potencias inferiores
+    private final JLabel[] etiquetasPotencias = new JLabel[8];
+
+    //Area de juego
+    private final PanelCaida zonaCaida = new PanelCaida();
+
+    //Constructor
     public PanelJuego() {
+
+        //Diseño del tablero
         setLayout(new BorderLayout(15, 15));
         setBorder(
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
@@ -47,11 +58,9 @@ public class PanelJuego extends JPanel {
 
         JPanel informacion = new JPanel(new BorderLayout());
 
-        informacion.add(
-                new JLabel("Jugador: Prueba"),
-                BorderLayout.WEST
-        );
+        informacion.add(new JLabel("Tetris binario"), BorderLayout.WEST);
 
+        //Tablero información
         informacion.add(etiquetaPuntuacion, BorderLayout.EAST);
         add(informacion, BorderLayout.NORTH);
 
@@ -93,17 +102,15 @@ public class PanelJuego extends JPanel {
 
         add(controles, BorderLayout.SOUTH);
 
-        // 500 milisegundos equivalen a 0.5 segundos.
+        //Temporizador de activación de la pista 1000 ms es 1s.
         temporizadorPista = new Timer(1000, e -> mostrarPista(false));
         temporizadorPista.setRepeats(false);
 
-        botonIdea.addActionListener(e -> mostrarPista(true));botonIdea.addActionListener(
-            e -> mostrarPista(!pistaVisible)
-        );
 
         reiniciarFilas(5);
         mostrarPuntuacion(0);
     }
+    
 
     private JPanel crearColumnaDerecha() {
         JPanel columna = new JPanel(new GridBagLayout());
@@ -112,8 +119,10 @@ public class PanelJuego extends JPanel {
                 new Dimension(FilaVista.ANCHO_OBJETIVO, 0)
         );
 
-        // Espacio vacío reservado para una imagen.
-        JPanel espacioImagen = new JPanel();
+        // Imagen.
+        PanelImagen espacioImagen =
+                new PanelImagen("/imagenes/images.jpg");
+
         espacioImagen.setBackground(Color.WHITE);
         espacioImagen.setBorder(
                 BorderFactory.createLineBorder(Color.GRAY)
@@ -124,33 +133,47 @@ public class PanelJuego extends JPanel {
         );
         espacioImagen.setMinimumSize(new Dimension(0, 0));
 
-        botonIdea.setPreferredSize(
-                new Dimension(FilaVista.ANCHO_OBJETIVO, 40)
+        // Tres pistas en una fila horizontal.
+        JPanel panelPistas = new JPanel(new GridLayout(1, 3, 6, 0));
+
+        panelPistas.setBorder(
+                BorderFactory.createTitledBorder("Pistas")
         );
 
-        // Evita que el clic quite el foco a los controles del juego.
-        botonIdea.setFocusable(false);
+        panelPistas.setPreferredSize(
+                new Dimension(FilaVista.ANCHO_OBJETIVO, 60)
+        );
 
+        for (int i = 0; i < botonesPista.length; i++) {
+            botonesPista[i] = new JButton(String.valueOf(i + 1));
+            botonesPista[i].setMargin(new Insets(4, 2, 4, 2));
+            botonesPista[i].setToolTipText("Pista " + (i + 1));
+            botonesPista[i].setFocusable(false);
+
+            panelPistas.add(botonesPista[i]);
+        }
+
+        // Configurar ANTES de agregar los componentes.
         GridBagConstraints posicion = new GridBagConstraints();
-
         posicion.gridx = 0;
         posicion.weightx = 1;
         posicion.fill = GridBagConstraints.BOTH;
 
-        // Primera sección: imagen.
+        // Primera posición: imagen.
         posicion.gridy = 0;
         posicion.weighty = 0.4;
+        posicion.insets = new Insets(0, 0, 0, 0);
 
         columna.add(espacioImagen, posicion);
 
-        // Segunda sección: botón Idea.
+        // Segunda posición: pistas.
         posicion.gridy = 1;
         posicion.weighty = 0;
         posicion.insets = new Insets(12, 0, 0, 0);
 
-        columna.add(botonIdea, posicion);
+        columna.add(panelPistas, posicion);
 
-        // Espacio entre el botón y los objetivos inferiores.
+        // Tercera posición: espacio libre sobre los objetivos.
         JPanel espacioLibre = new JPanel();
         espacioLibre.setPreferredSize(new Dimension(0, 0));
         espacioLibre.setMinimumSize(new Dimension(0, 0));
@@ -214,7 +237,7 @@ public class PanelJuego extends JPanel {
     }
 
     // Se habilita nuevamente cuando termina la pista.
-    botonIdea.setEnabled(!mostrar);
+    actualizarBotonesPista();
 
     if (mostrar) {
         temporizadorPista.start();
@@ -292,6 +315,23 @@ public class PanelJuego extends JPanel {
         etiquetaEstado.setForeground(
                 infectada ? new Color(160, 0, 0) : Color.BLACK
         );
+    }
+
+    private void actualizarBotonesPista() {
+    for (int i = 0; i < botonesPista.length; i++) {
+        botonesPista[i].setEnabled(
+                pistasDisponibles[i] && !pistaVisible
+        );
+    }
+}
+
+    public void mostrarPistaDisponible(int indice, boolean disponible) {
+        pistasDisponibles[indice] = disponible;
+        actualizarBotonesPista();
+    }
+
+    public JButton getBotonPista(int indice) {
+        return botonesPista[indice];
     }
 
     public void mostrarEstado(String mensaje) {
