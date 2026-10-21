@@ -24,6 +24,7 @@ public class VentanaPrincipal extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        // Agregar las pantallas a la misma ventana.
         pantallas.add(menu, "MENU");
         pantallas.add(juego, "JUEGO");
         pantallas.add(resultado, "RESULTADO");
@@ -32,16 +33,35 @@ public class VentanaPrincipal extends JFrame {
 
         setContentPane(pantallas);
 
-        menu.getBotonJugar().addActionListener(e -> mostrarJuego());
+        // Navegación desde el menú.
+        menu.getBotonJugar().addActionListener(
+                e -> mostrarJuego()
+        );
+
         menu.getBotonPuntuaciones().addActionListener(
                 e -> mostrarPuntuaciones()
         );
-        menu.getBotonCreditos().addActionListener(e -> mostrarCreditos());
 
-        juego.getBotonVolver().addActionListener(e -> mostrarMenu());
-        resultado.getBotonVolver().addActionListener(e -> mostrarMenu());
-        puntuaciones.getBotonVolver().addActionListener(e -> mostrarMenu());
-        creditos.getBotonVolver().addActionListener(e -> mostrarMenu());
+        menu.getBotonCreditos().addActionListener(
+                e -> mostrarCreditos()
+        );
+
+        // Regresar al menú desde las otras pantallas.
+        juego.getBotonVolver().addActionListener(
+                e -> mostrarMenu()
+        );
+
+        resultado.getBotonVolver().addActionListener(
+                e -> mostrarMenu()
+        );
+
+        puntuaciones.getBotonVolver().addActionListener(
+                e -> mostrarMenu()
+        );
+
+        creditos.getBotonVolver().addActionListener(
+                e -> mostrarMenu()
+        );
 
         mostrarMenu();
     }
