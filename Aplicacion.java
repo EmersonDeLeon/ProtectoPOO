@@ -9,7 +9,7 @@ import repositorio.RepositorioPuntuaciones;
 import repositorio.RepositorioUsuarios;
 import view.Fuentes;
 import view.VentanaPrincipal;
-import controller.tetrisController;
+import controller.TetrisController;
 import modelo.JuegoTetrisBinario;
 
 public class Aplicacion {
@@ -68,7 +68,7 @@ public class Aplicacion {
         );
 
         JuegoTetrisBinario juego = new JuegoTetrisBinario();
-        new tetrisController(juego, ventanaPrincipal);
+        new TetrisController(juego, ventanaPrincipal);
 
         gestorPantallas.mostrarMenu();
         ventanaPrincipal.setVisible(true);

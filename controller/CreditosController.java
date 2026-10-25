@@ -13,7 +13,7 @@ public class CreditosController {
     private final PanelCreditos panel;
     private final List<Credito> creditos;
 
-    public creditosController(
+    public CreditosController(
             VentanaPrincipal ventanaPrincipal,
             GestorPantallas gestorPantallas
     ) {
