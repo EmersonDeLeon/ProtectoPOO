@@ -11,7 +11,7 @@ import modelo.JuegoTetrisBinario;
 import view.PanelJuego;
 import view.VentanaPrincipal;
 
-public class tetrisController {
+public class TetrisController {
 
     private static final int INTERVALO_ANIMACION_MS = 30;
     private static final int DURACION_CAIDA_MS = 3500;
@@ -27,7 +27,7 @@ public class tetrisController {
     private double progreso;
     private boolean partidaActiva;
 
-    public tetrisController(
+    public TetrisController(
             JuegoTetrisBinario juego,
             VentanaPrincipal ventana
     ) {
