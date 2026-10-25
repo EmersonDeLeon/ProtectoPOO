@@ -27,7 +27,7 @@ public class tetrisController {
     private double progreso;
     private boolean partidaActiva;
 
-    public tetrisController(
+    public TetrisController(
             JuegoTetrisBinario juego,
             VentanaPrincipal ventana
     ) {
