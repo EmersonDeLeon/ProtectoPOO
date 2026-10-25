@@ -13,7 +13,8 @@ public class JuegoTetrisBinario {
     public enum ResultadoCaida {
         BLOQUE_CORRECTO,
         FILA_COMPLETADA,
-        FILA_INFECTADA
+        FILA_INFECTADA,
+        PARTIDA_TERMINADA
     }
 
     public static final int CANTIDAD_PISTAS = 3;
@@ -55,7 +56,14 @@ public class JuegoTetrisBinario {
         exigirEstado(Estado.EN_CURSO);
 
         boolean correcta = tablero.colocarUno(columna);
+        
         if (!correcta) {
+        // Incluye las filas inactivas y la que acaba de fallar.
+            if (tablero.getCantidadFilas() >= 10) {
+                estado = Estado.TERMINADO;
+                return ResultadoCaida.PARTIDA_TERMINADA;
+            }
+
             estado = Estado.ESPERANDO_NUEVA_FILA;
             return ResultadoCaida.FILA_INFECTADA;
         }

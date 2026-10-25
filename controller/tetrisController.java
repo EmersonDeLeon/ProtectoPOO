@@ -181,6 +181,12 @@ public class tetrisController {
                 panel.mostrarEstado("¡Fila completada!");
                 temporizadorTransicion.start();
                 break;
+            case PARTIDA_TERMINADA:
+                partidaActiva = false;
+                detenerTemporizadores();
+                panel.ocultarBloque();
+                ventana.mostrarResultado(juego.getPuntuacion());
+                break;
             default:
                 throw new IllegalStateException("Resultado de caída desconocido.");
         }
