@@ -9,6 +9,8 @@ import repositorio.RepositorioPuntuaciones;
 import repositorio.RepositorioUsuarios;
 import view.Fuentes;
 import view.VentanaPrincipal;
+import controller.tetrisController;
+import modelo.JuegoTetrisBinario;
 
 public class Aplicacion {
 
@@ -61,9 +63,15 @@ public class Aplicacion {
         });
 
         gestorPantallas = new GestorPantallas(
-                ventanaPrincipal,
-                repositorioUsuarios
+        ventanaPrincipal,
+        repositorioUsuarios
         );
+
+        JuegoTetrisBinario juego = new JuegoTetrisBinario();
+        new tetrisController(juego, ventanaPrincipal);
+
+        gestorPantallas.mostrarMenu();
+        ventanaPrincipal.setVisible(true);
         gestorPantallas.mostrarMenu();
         ventanaPrincipal.setVisible(true);
     }

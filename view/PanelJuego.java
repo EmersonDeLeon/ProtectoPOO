@@ -15,6 +15,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import java.awt.Point;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.BoxLayout;
+
+
 
 public class PanelJuego extends JPanel {
 
@@ -22,7 +28,12 @@ public class PanelJuego extends JPanel {
     private final List<FilaVista> filas = new ArrayList<>();
 
     private final JPanel contenedorFilas =
-            new JPanel(new GridLayout(0, 1, 0, 6));
+        new JPanel(new GridLayout(0, 1, 0, 6));
+
+    private final JPanel contenedorObjetivos = new JPanel();
+
+    private final JScrollPane desplazamientoObjetivos =
+        new JScrollPane();
 
     // Valores
     private final JLabel etiquetaPuntuacion = new JLabel();
@@ -50,7 +61,14 @@ public class PanelJuego extends JPanel {
     //Constructor
     public PanelJuego() {
 
+        
+
         //Diseño del tablero
+
+        contenedorObjetivos.setLayout(
+        new BoxLayout(contenedorObjetivos, BoxLayout.Y_AXIS)
+        );
+
         setLayout(new BorderLayout(15, 15));
         setBorder(
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
@@ -69,31 +87,60 @@ public class PanelJuego extends JPanel {
                 BorderFactory.createTitledBorder("Tablero binario")
         );
 
-        // Zona de caída a la izquierda.
-        // Espacio para imagen y botón Idea a la derecha.
-        JPanel zonaSuperior =
-                new JPanel(new BorderLayout(10, 0));
+        // Izquierda: caída y filas binarias apoyadas abajo.
+        JPanel zonaIzquierda = new JPanel(new BorderLayout());
 
-        zonaSuperior.add(zonaCaida, BorderLayout.CENTER);
-        zonaSuperior.add(
-                crearColumnaDerecha(),
-                BorderLayout.EAST
-        );
+        zonaIzquierda.add(zonaCaida, BorderLayout.CENTER);
 
-        tablero.add(zonaSuperior, BorderLayout.CENTER);
-
-        // Las filas incluyen sus objetivos a la derecha.
-        // La guía aparece una sola vez debajo de todas ellas.
-        JPanel zonaInferior =
-                new JPanel(new BorderLayout(0, 4));
-
+        JPanel zonaInferior = new JPanel(new BorderLayout(0, 4));
         zonaInferior.add(contenedorFilas, BorderLayout.CENTER);
-        zonaInferior.add(
-                crearGuiaPotencias(),
-                BorderLayout.SOUTH
+        zonaInferior.add(crearGuiaPotencias(), BorderLayout.SOUTH);
+
+        zonaIzquierda.add(zonaInferior, BorderLayout.SOUTH);
+
+        // Los objetivos se apoyan abajo cuando hay pocos.
+        JPanel soporteObjetivos = new JPanel(new BorderLayout());
+        soporteObjetivos.add(contenedorObjetivos, BorderLayout.NORTH);
+
+        desplazamientoObjetivos.setViewportView(soporteObjetivos);
+        desplazamientoObjetivos.setPreferredSize(
+                new Dimension(FilaVista.ANCHO_OBJETIVO, 180)
+        );
+        desplazamientoObjetivos.setBorder(
+                BorderFactory.createEmptyBorder()
+        );
+        desplazamientoObjetivos.setVerticalScrollBarPolicy(
+                JScrollPane.VERTICAL_SCROLLBAR_NEVER
+        );
+        desplazamientoObjetivos.setHorizontalScrollBarPolicy(
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        );
+        desplazamientoObjetivos.setWheelScrollingEnabled(false);
+        desplazamientoObjetivos.setFocusable(false);
+
+        // Derecha: imagen y pistas independientes de las filas binarias.
+        JPanel zonaDerecha = new JPanel(new BorderLayout());
+        zonaDerecha.setPreferredSize(
+                new Dimension(FilaVista.ANCHO_OBJETIVO, 0)
         );
 
-        tablero.add(zonaInferior, BorderLayout.SOUTH);
+        JPanel cabeceraDerecha = crearColumnaDerecha();
+        cabeceraDerecha.setPreferredSize(
+                new Dimension(FilaVista.ANCHO_OBJETIVO, 240)
+        );
+
+        JPanel contenidoDerecho = new JPanel(new BorderLayout(0, 8));
+        contenidoDerecho.add(cabeceraDerecha, BorderLayout.NORTH);
+        contenidoDerecho.add(desplazamientoObjetivos, BorderLayout.CENTER);
+
+        zonaDerecha.add(contenidoDerecho, BorderLayout.CENTER);
+
+        tablero.add(zonaIzquierda, BorderLayout.CENTER);
+        tablero.add(zonaDerecha, BorderLayout.EAST);
+
+        // Separación entre las dos columnas.
+        ((BorderLayout) tablero.getLayout()).setHgap(10);
+
         add(tablero, BorderLayout.CENTER);
 
         JPanel controles = new JPanel(new BorderLayout(10, 0));
@@ -103,7 +150,7 @@ public class PanelJuego extends JPanel {
         add(controles, BorderLayout.SOUTH);
 
         //Temporizador de activación de la pista 1000 ms es 1s.
-        temporizadorPista = new Timer(1000, e -> mostrarPista(false));
+        temporizadorPista = new Timer(5000, e -> mostrarPista(false));
         temporizadorPista.setRepeats(false);
 
 
@@ -173,17 +220,6 @@ public class PanelJuego extends JPanel {
 
         columna.add(panelPistas, posicion);
 
-        // Tercera posición: espacio libre sobre los objetivos.
-        JPanel espacioLibre = new JPanel();
-        espacioLibre.setPreferredSize(new Dimension(0, 0));
-        espacioLibre.setMinimumSize(new Dimension(0, 0));
-
-        posicion.gridy = 2;
-        posicion.weighty = 0.6;
-        posicion.insets = new Insets(0, 0, 0, 0);
-
-        columna.add(espacioLibre, posicion);
-
         return columna;
     }
 
@@ -204,16 +240,7 @@ public class PanelJuego extends JPanel {
         }
 
         // Mantiene la guía alineada con las ocho casillas.
-        JPanel espacioObjetivos = new JPanel();
-        espacioObjetivos.setPreferredSize(
-                new Dimension(FilaVista.ANCHO_OBJETIVO, 0)
-        );
-
-        JPanel guia = new JPanel(new BorderLayout(10, 0));
-        guia.add(potencias, BorderLayout.CENTER);
-        guia.add(espacioObjetivos, BorderLayout.EAST);
-
-        return guia;
+            return potencias;
     }
 
     public void mostrarPista(boolean mostrar) {
@@ -250,10 +277,30 @@ public class PanelJuego extends JPanel {
         }
 
         FilaVista nueva = new FilaVista(objetivo);
+
+        nueva.setPreferredSize(new Dimension(0, 55));
+        nueva.setMinimumSize(new Dimension(0, 55));
+        nueva.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
+
         nueva.setActiva(true);
 
         filas.add(0, nueva);
         contenedorFilas.add(nueva, 0);
+
+        JPanel objetivoVisual = nueva.getPanelObjetivo();
+
+        objetivoVisual.setPreferredSize(
+                new Dimension(FilaVista.ANCHO_OBJETIVO, 55)
+        );
+        objetivoVisual.setMinimumSize(
+                new Dimension(FilaVista.ANCHO_OBJETIVO, 55)
+        );
+        objetivoVisual.setMaximumSize(
+                new Dimension(FilaVista.ANCHO_OBJETIVO, 55)
+        );
+
+        contenedorObjetivos.add(objetivoVisual, 0);
+        actualizarAreaFilas();
 
         actualizarEstado();
         revalidate();
@@ -270,6 +317,8 @@ public class PanelJuego extends JPanel {
         // Retira también el objetivo decimal de esa fila.
         FilaVista retirada = filas.remove(0);
         contenedorFilas.remove(retirada);
+        contenedorObjetivos.remove(retirada.getPanelObjetivo());
+        actualizarAreaFilas();
 
         filas.get(0).setActiva(true);
 
@@ -283,6 +332,7 @@ public class PanelJuego extends JPanel {
 
         filas.clear();
         contenedorFilas.removeAll();
+        contenedorObjetivos.removeAll();
 
         agregarFila(objetivo);
         mostrarPista(false);
@@ -349,5 +399,22 @@ public class PanelJuego extends JPanel {
 
     public JButton getBotonVolver() {
         return botonVolver;
+    }
+
+    private void actualizarAreaFilas() {
+        contenedorFilas.revalidate();
+        contenedorFilas.repaint();
+
+        contenedorObjetivos.revalidate();
+        contenedorObjetivos.repaint();
+
+        revalidate();
+        repaint();
+
+        SwingUtilities.invokeLater(() -> {
+            // Mostrar el objetivo más reciente cuando haya desbordamiento.
+            desplazamientoObjetivos.getViewport()
+                    .setViewPosition(new Point(0, 0));
+        });
     }
 }

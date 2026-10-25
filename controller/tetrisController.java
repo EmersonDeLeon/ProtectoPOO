@@ -14,7 +14,7 @@ import view.VentanaPrincipal;
 public class tetrisController {
 
     private static final int INTERVALO_ANIMACION_MS = 30;
-    private static final int DURACION_CAIDA_MS = 1800;
+    private static final int DURACION_CAIDA_MS = 3500;
     private static final int PAUSA_TRANSICION_MS = 700;
 
     private final JuegoTetrisBinario juego;
@@ -71,7 +71,7 @@ public class tetrisController {
             panel.mostrarPistaDisponible(i, true);
         }
         mostrarBloque();
-        panel.mostrarEstado("← → mover · Espacio soltar · Pistas: 1, 2, 3");
+        panel.mostrarEstado("← → mover · Espacio soltar");
         temporizadorCaida.start();
     }
 
