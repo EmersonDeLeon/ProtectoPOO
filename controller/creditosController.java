@@ -23,7 +23,7 @@ public class creditosController {
             );
         }
         this.gestorPantallas = gestorPantallas;
-        this.panel = ventanaPrincipal.getPanelCreditos();
+        this.panel = ventanaPrincipal.getCreditos();
         this.creditos = Collections.unmodifiableList(Arrays.asList(
                 new Credito("Justin Paz", "Integrante", "Proyecto de POO"),
                 new Credito("Emerson de León", "Integrante", "Proyecto de POO")
@@ -32,11 +32,9 @@ public class creditosController {
         ventanaPrincipal.getPanelMenu().getBotonCreditos()
                 .addActionListener(e -> mostrarCreditos());
         panel.getBotonVolver().addActionListener(e -> volverAlMenu());
-        panel.mostrarCreditos(creditos);
     }
 
     public void mostrarCreditos() {
-        panel.mostrarCreditos(creditos);
         gestorPantallas.mostrarCreditos();
     }
 
