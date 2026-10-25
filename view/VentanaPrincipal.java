@@ -17,6 +17,10 @@ public class VentanaPrincipal extends JFrame {
     private final PanelPuntuaciones puntuaciones = new PanelPuntuaciones();
     private final PanelCreditos creditos = new PanelCreditos();
 
+    public PanelCreditos getCreditos() {
+        return creditos;
+    }
+
     public VentanaPrincipal() {
         setTitle("Tetris binario");
         setSize(680, 820);
