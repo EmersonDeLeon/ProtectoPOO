@@ -1,4 +1,5 @@
 import controller.GestorPantallas;
+import controller.RankingController;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -19,6 +20,7 @@ public class Aplicacion {
     private final RepositorioPuntuaciones repositorioPuntuaciones;
 
     private GestorPantallas gestorPantallas;
+    private RankingController rankingController;
     private VentanaPrincipal ventanaPrincipal;
 
     public Aplicacion() {

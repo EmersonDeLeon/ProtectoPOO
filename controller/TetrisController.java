@@ -8,6 +8,8 @@ import javax.swing.KeyStroke;
 import javax.swing.Timer;
 import modelo.FilaBinaria;
 import modelo.JuegoTetrisBinario;
+import modelo.ResultadoTetris;
+import repositorio.RepositorioPuntuaciones;
 import view.PanelJuego;
 import view.VentanaPrincipal;
 
@@ -18,6 +20,7 @@ public class TetrisController {
     private static final int PAUSA_TRANSICION_MS = 700;
 
     private final JuegoTetrisBinario juego;
+    private final RepositorioPuntuaciones repositorioPuntuaciones;
     private final VentanaPrincipal ventana;
     private final PanelJuego panel;
     private final Timer temporizadorCaida;
@@ -26,18 +29,28 @@ public class TetrisController {
     private int columna;
     private double progreso;
     private boolean partidaActiva;
+    private boolean resultadoGuardado;
 
     public TetrisController(
             JuegoTetrisBinario juego,
             VentanaPrincipal ventana
     ) {
-        if (juego == null || ventana == null) {
+        this(juego, ventana, new RepositorioPuntuaciones());
+    }
+
+    public tetrisController(
+            JuegoTetrisBinario juego,
+            VentanaPrincipal ventana,
+            RepositorioPuntuaciones repositorioPuntuaciones
+    ) {
+        if (juego == null || ventana == null || repositorioPuntuaciones == null) {
             throw new IllegalArgumentException(
-                    "El juego y la ventana son obligatorios."
+                    "El juego, la ventana y el repositorio son obligatorios."
             );
         }
         this.juego = juego;
         this.ventana = ventana;
+        this.repositorioPuntuaciones = repositorioPuntuaciones;
         this.panel = ventana.getPanelJuego();
 
         temporizadorCaida = new Timer(
@@ -54,6 +67,8 @@ public class TetrisController {
                 e -> iniciarPartida()
         );
         panel.getBotonVolver().addActionListener(e -> detenerPartida());
+        ventana.getPanelResultado().getBotonGuardar()
+                .addActionListener(e -> guardarResultado());
     }
 
     public void iniciarPartida() {
@@ -185,6 +200,10 @@ public class TetrisController {
                 partidaActiva = false;
                 detenerTemporizadores();
                 panel.ocultarBloque();
+<<<<<<< HEAD:controller/tetrisController.java
+                resultadoGuardado = false;
+=======
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661:controller/TetrisController.java
                 ventana.mostrarResultado(juego.getPuntuacion());
                 break;
             default:
@@ -210,6 +229,7 @@ public class TetrisController {
             if (terminado) {
                 partidaActiva = false;
                 panel.ocultarBloque();
+                resultadoGuardado = false;
                 ventana.mostrarResultado(juego.getPuntuacion());
             } else {
                 panel.retirarFilaActiva();
@@ -246,6 +266,34 @@ public class TetrisController {
         panel.mostrarPista(true);
         panel.mostrarEstado("Pista " + (indice + 1)
                 + ": pesos de izquierda a derecha, de 128 a 1.");
+    }
+
+    private void guardarResultado() {
+        if (resultadoGuardado) {
+            return;
+        }
+        String nombre = ventana.getPanelResultado().getNombreIngresado();
+        if (nombre == null || nombre.trim().isEmpty()) {
+            ventana.getPanelResultado().mostrarError(
+                    "Escribe tu nombre antes de guardar."
+            );
+            return;
+        }
+
+        try {
+            repositorioPuntuaciones.registrarResultado(
+                    new ResultadoTetris(nombre, juego.getPuntuacion())
+            );
+            resultadoGuardado = true;
+            ventana.getPanelResultado().setEdicionHabilitada(false);
+            ventana.getPanelResultado().mostrarConfirmacion(
+                    "Puntuación guardada en calificaciones.csv."
+            );
+        } catch (java.io.IOException | IllegalStateException e) {
+            ventana.getPanelResultado().mostrarError(
+                    "No se pudo guardar la puntuación: " + e.getMessage()
+            );
+        }
     }
 
     private void actualizarFilaActiva() {
