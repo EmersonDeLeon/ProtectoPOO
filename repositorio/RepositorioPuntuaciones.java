@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import modelo.ResultadoTetris;
 
+/** Guarda y consulta las calificaciones del juego en formato CSV. */
 public class RepositorioPuntuaciones {
 
     private static final int MAX_RESULTADOS = 100000;
@@ -84,6 +85,7 @@ public class RepositorioPuntuaciones {
         resultados = cargados;
     }
 
+    /** Guarda los resultados actuales en el archivo CSV. */
     public void guardar() throws IOException {
         guardarLista(resultados);
     }
@@ -103,7 +105,6 @@ public class RepositorioPuntuaciones {
 
         List<ResultadoTetris> actualizados = new ArrayList<>(resultados);
         actualizados.add(resultado);
-        actualizados.sort(ORDEN_PUNTAJE);
         guardarLista(actualizados);
         resultados = actualizados;
     }

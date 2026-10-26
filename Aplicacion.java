@@ -67,13 +67,22 @@ public class Aplicacion {
         gestorPantallas = new GestorPantallas(
         ventanaPrincipal,
         repositorioUsuarios
+);
+
+        rankingController = new RankingController(
+                repositorioPuntuaciones,
+                ventanaPrincipal,
+                gestorPantallas
         );
 
         JuegoTetrisBinario juego = new JuegoTetrisBinario();
-    new TetrisController(juego, ventanaPrincipal);
 
-        gestorPantallas.mostrarMenu();
-        ventanaPrincipal.setVisible(true);
+        new TetrisController(
+                juego,
+                ventanaPrincipal,
+                repositorioPuntuaciones
+        );
+
         gestorPantallas.mostrarMenu();
         ventanaPrincipal.setVisible(true);
     }

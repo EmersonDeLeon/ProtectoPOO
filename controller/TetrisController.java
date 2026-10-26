@@ -33,13 +33,6 @@ public class TetrisController {
 
     public TetrisController(
             JuegoTetrisBinario juego,
-            VentanaPrincipal ventana
-    ) {
-        this(juego, ventana, new RepositorioPuntuaciones());
-    }
-
-    public TetrisController(
-            JuegoTetrisBinario juego,
             VentanaPrincipal ventana,
             RepositorioPuntuaciones repositorioPuntuaciones
     ) {
@@ -73,8 +66,14 @@ public class TetrisController {
 
     public void iniciarPartida() {
         detenerTemporizadores();
+
+        temporizadorTransicion.setInitialDelay(PAUSA_TRANSICION_MS);
+        temporizadorTransicion.setDelay(PAUSA_TRANSICION_MS);
+
         juego.iniciar();
         partidaActiva = true;
+        resultadoGuardado = false;
+        
         columna = 0;
         progreso = 0;
 
