@@ -21,16 +21,16 @@ public class PanelCreditos extends JPanel {
                 "Créditos", SwingConstants.CENTER
         );
         titulo.setFont(Fuentes.pixel(20f));
-        add(titulo, BorderLayout.NORTH);
 
-        JPanel textos = new JPanel(new GridLayout(5, 1, 0, 20));
+
+        JPanel textos = new JPanel(new GridLayout(5, 1, 0, 10));
 
         String[] lineas = {
             "Tetris binario",
             "Proyecto de POO",
-            "Integrantes",
-            "Justin Paz",
-            "Emerson de León"
+            "",
+            "Integrantes:",
+            "Justin Paz y Emerson de León"
         };
 
         for (String texto : lineas) {
@@ -41,8 +41,12 @@ public class PanelCreditos extends JPanel {
             textos.add(etiqueta);
         }
 
+        JPanel contenido = new JPanel(new BorderLayout(0, 20));
+        contenido.add(titulo, BorderLayout.NORTH);
+        contenido.add(textos, BorderLayout.CENTER);
+
         JPanel centro = new JPanel(new GridBagLayout());
-        centro.add(textos);
+        centro.add(contenido);
         add(centro, BorderLayout.CENTER);
 
         JPanel controles = new JPanel();

@@ -156,7 +156,7 @@ public class PanelJuego extends JPanel {
         add(controles, BorderLayout.SOUTH);
 
         //Temporizador de activación de la pista 1000 ms es 1s.
-        temporizadorPista = new Timer(5000, e -> mostrarPista(false));
+        temporizadorPista = new Timer(10000, e -> mostrarPista(false));
         temporizadorPista.setRepeats(false);
 
 

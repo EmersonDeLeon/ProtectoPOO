@@ -16,7 +16,7 @@ import view.VentanaPrincipal;
 public class TetrisController {
 
     private static final int INTERVALO_ANIMACION_MS = 30;
-    private static final int DURACION_CAIDA_MS = 3500;
+    private static final int DURACION_CAIDA_MS = 5000;
     private static final int PAUSA_TRANSICION_MS = 700;
 
     private final JuegoTetrisBinario juego;
