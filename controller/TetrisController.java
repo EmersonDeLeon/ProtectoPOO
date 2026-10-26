@@ -25,6 +25,8 @@ public class TetrisController {
     private final PanelJuego panel;
     private final Timer temporizadorCaida;
     private final Timer temporizadorTransicion;
+    private Timer temporizadorDerrota;
+
 
     private int columna;
     private double progreso;
@@ -79,6 +81,7 @@ public class TetrisController {
 
         FilaBinaria fila = juego.getTablero().getFilaActiva();
         panel.reiniciarFilas(fila.getObjetivo());
+        panel.mostrarRobotFeliz();
         actualizarFilaActiva();
         panel.mostrarPuntuacion(0);
         for (int i = 0; i < JuegoTetrisBinario.CANTIDAD_PISTAS; i++) {
@@ -187,11 +190,13 @@ public class TetrisController {
                 programarSiguienteBloque();
                 break;
             case FILA_INFECTADA:
+                panel.mostrarRobotNervioso();
                 panel.mostrarInfeccion(true);
                 panel.mostrarEstado("Fila infectada. Aparecerá una nueva arriba.");
                 temporizadorTransicion.start();
                 break;
             case FILA_COMPLETADA:
+                panel.mostrarRobotFeliz();
                 panel.mostrarEstado("¡Fila completada!");
                 temporizadorTransicion.start();
                 break;
@@ -199,8 +204,17 @@ public class TetrisController {
                 partidaActiva = false;
                 detenerTemporizadores();
                 panel.ocultarBloque();
+                panel.mostrarRobotEnojado();
                 resultadoGuardado = false;
-                ventana.mostrarResultado(juego.getPuntuacion());
+
+                int puntuacionFinal = juego.getPuntuacion();
+
+                temporizadorDerrota = new Timer(1500, e -> {
+                    ventana.mostrarResultado(puntuacionFinal);
+                });
+
+                temporizadorDerrota.setRepeats(false);
+                temporizadorDerrota.start();
                 break;
             default:
                 throw new IllegalStateException("Resultado de caída desconocido.");
@@ -314,5 +328,9 @@ public class TetrisController {
     private void detenerTemporizadores() {
         temporizadorCaida.stop();
         temporizadorTransicion.stop();
+
+        if (temporizadorDerrota != null) {
+            temporizadorDerrota.stop();
+        }
     }
 }

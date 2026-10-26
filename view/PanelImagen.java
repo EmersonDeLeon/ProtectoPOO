@@ -16,7 +16,7 @@ public class PanelImagen extends JPanel {
     private BufferedImage imagen;
 
     public PanelImagen(String rutaRecurso) {
-        setBackground(Color.WHITE);
+        setBackground(Color.BLACK);
 
         // Carga la imagen una sola vez.
         try (InputStream archivo =
@@ -98,4 +98,30 @@ public class PanelImagen extends JPanel {
             dibujo.dispose();
         }
     }
+
+    public void cambiarImagen(String rutaRecurso) {
+    try (InputStream archivo =
+            PanelImagen.class.getResourceAsStream(rutaRecurso)) {
+
+        if (archivo == null) {
+            throw new IOException(
+                    "No se encontró la imagen: " + rutaRecurso
+            );
+        }
+
+        BufferedImage nuevaImagen = ImageIO.read(archivo);
+
+        if (nuevaImagen == null) {
+            throw new IOException(
+                    "No se pudo leer la imagen: " + rutaRecurso
+            );
+        }
+
+        imagen = nuevaImagen;
+        repaint();
+
+    } catch (IOException e) {
+        System.err.println("AVISO: " + e.getMessage());
+    }
+}
 }

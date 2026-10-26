@@ -19,6 +19,9 @@ import java.awt.Point;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
+import java.awt.Image;
+import java.net.URL;
+import javax.swing.ImageIcon;
 
 
 
@@ -57,6 +60,9 @@ public class PanelJuego extends JPanel {
 
     //Area de juego
     private final PanelCaida zonaCaida = new PanelCaida();
+
+    private final PanelImagen imagenRobot =
+        new PanelImagen("/imagenes/feliz.jpeg");
 
     //Constructor
     public PanelJuego() {
@@ -167,10 +173,9 @@ public class PanelJuego extends JPanel {
         );
 
         // Imagen.
-        PanelImagen espacioImagen =
-                new PanelImagen("/imagenes/images.jpg");
+        PanelImagen espacioImagen = imagenRobot;
 
-        espacioImagen.setBackground(Color.WHITE);
+        espacioImagen.setBackground(Color.BLACK);
         espacioImagen.setBorder(
                 BorderFactory.createLineBorder(Color.GRAY)
         );
@@ -191,10 +196,33 @@ public class PanelJuego extends JPanel {
                 new Dimension(FilaVista.ANCHO_OBJETIVO, 60)
         );
 
+        URL rutaIdea = PanelJuego.class.getResource("/imagenes/idea.jpg");
+        ImageIcon iconoIdea = null;
+
+        if (rutaIdea != null) {
+            Image imagen = new ImageIcon(rutaIdea).getImage();
+            iconoIdea = new ImageIcon(
+                    imagen.getScaledInstance(28, 28, Image.SCALE_SMOOTH)
+            );
+        }
+
         for (int i = 0; i < botonesPista.length; i++) {
-            botonesPista[i] = new JButton(String.valueOf(i + 1));
+            botonesPista[i] = new JButton();
+
+            if (iconoIdea != null) {
+                botonesPista[i].setIcon(iconoIdea);
+            } else {
+                // Mantener un botón visible si no se encuentra la imagen.
+                botonesPista[i].setText(String.valueOf(i + 1));
+            }
+
             botonesPista[i].setMargin(new Insets(4, 2, 4, 2));
-            botonesPista[i].setToolTipText("Pista " + (i + 1));
+            botonesPista[i].setToolTipText(
+                    "Pista " + (i + 1) + " · Tecla " + (i + 1)
+            );
+            botonesPista[i].getAccessibleContext().setAccessibleName(
+                    "Pista " + (i + 1)
+            );
             botonesPista[i].setFocusable(false);
 
             panelPistas.add(botonesPista[i]);
@@ -416,5 +444,17 @@ public class PanelJuego extends JPanel {
             desplazamientoObjetivos.getViewport()
                     .setViewPosition(new Point(0, 0));
         });
+    }
+
+    public void mostrarRobotFeliz() {
+        imagenRobot.cambiarImagen("/imagenes/feliz.jpeg");
+    }
+
+    public void mostrarRobotNervioso() {
+        imagenRobot.cambiarImagen("/imagenes/nervioso.jpeg");
+    }
+
+    public void mostrarRobotEnojado() {
+        imagenRobot.cambiarImagen("/imagenes/enojado.jpeg");
     }
 }

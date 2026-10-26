@@ -22,7 +22,7 @@ public class FilaVista extends JPanel {
     private final JLabel[] casillas = new JLabel[8];
 
     private final JPanel informacion =
-        new JPanel(new GridLayout(2, 1));
+        new JPanel(new GridLayout(1, 1));
 
     private final JLabel etiquetaObjetivo =
             new JLabel("", SwingConstants.CENTER);
@@ -61,8 +61,8 @@ public class FilaVista extends JPanel {
         etiquetaObjetivo.setFont(Fuentes.pixel(10f));
         etiquetaEstado.setFont(Fuentes.pixel(8f));
 
+        informacion.removeAll();
         informacion.add(etiquetaObjetivo);
-        informacion.add(etiquetaEstado);
 
         mostrarObjetivo(objetivo);
         actualizarApariencia();
