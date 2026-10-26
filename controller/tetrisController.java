@@ -8,16 +8,19 @@ import javax.swing.KeyStroke;
 import javax.swing.Timer;
 import modelo.FilaBinaria;
 import modelo.JuegoTetrisBinario;
+import modelo.ResultadoTetris;
+import repositorio.RepositorioPuntuaciones;
 import view.PanelJuego;
 import view.VentanaPrincipal;
 
 public class tetrisController {
 
     private static final int INTERVALO_ANIMACION_MS = 30;
-    private static final int DURACION_CAIDA_MS = 1800;
+    private static final int DURACION_CAIDA_MS = 3500;
     private static final int PAUSA_TRANSICION_MS = 700;
 
     private final JuegoTetrisBinario juego;
+    private final RepositorioPuntuaciones repositorioPuntuaciones;
     private final VentanaPrincipal ventana;
     private final PanelJuego panel;
     private final Timer temporizadorCaida;
@@ -26,18 +29,28 @@ public class tetrisController {
     private int columna;
     private double progreso;
     private boolean partidaActiva;
+    private boolean resultadoGuardado;
 
     public tetrisController(
             JuegoTetrisBinario juego,
             VentanaPrincipal ventana
     ) {
-        if (juego == null || ventana == null) {
+        this(juego, ventana, new RepositorioPuntuaciones());
+    }
+
+    public tetrisController(
+            JuegoTetrisBinario juego,
+            VentanaPrincipal ventana,
+            RepositorioPuntuaciones repositorioPuntuaciones
+    ) {
+        if (juego == null || ventana == null || repositorioPuntuaciones == null) {
             throw new IllegalArgumentException(
-                    "El juego y la ventana son obligatorios."
+                    "El juego, la ventana y el repositorio son obligatorios."
             );
         }
         this.juego = juego;
         this.ventana = ventana;
+        this.repositorioPuntuaciones = repositorioPuntuaciones;
         this.panel = ventana.getPanelJuego();
 
         temporizadorCaida = new Timer(
@@ -54,6 +67,8 @@ public class tetrisController {
                 e -> iniciarPartida()
         );
         panel.getBotonVolver().addActionListener(e -> detenerPartida());
+        ventana.getPanelResultado().getBotonGuardar()
+                .addActionListener(e -> guardarResultado());
     }
 
     public void iniciarPartida() {
@@ -71,7 +86,7 @@ public class tetrisController {
             panel.mostrarPistaDisponible(i, true);
         }
         mostrarBloque();
-        panel.mostrarEstado("← → mover · Espacio soltar · Pistas: 1, 2, 3");
+        panel.mostrarEstado("← → mover · Espacio soltar");
         temporizadorCaida.start();
     }
 
@@ -181,6 +196,13 @@ public class tetrisController {
                 panel.mostrarEstado("¡Fila completada!");
                 temporizadorTransicion.start();
                 break;
+            case PARTIDA_TERMINADA:
+                partidaActiva = false;
+                detenerTemporizadores();
+                panel.ocultarBloque();
+                resultadoGuardado = false;
+                ventana.mostrarResultado(juego.getPuntuacion());
+                break;
             default:
                 throw new IllegalStateException("Resultado de caída desconocido.");
         }
@@ -204,6 +226,7 @@ public class tetrisController {
             if (terminado) {
                 partidaActiva = false;
                 panel.ocultarBloque();
+                resultadoGuardado = false;
                 ventana.mostrarResultado(juego.getPuntuacion());
             } else {
                 panel.retirarFilaActiva();
@@ -240,6 +263,34 @@ public class tetrisController {
         panel.mostrarPista(true);
         panel.mostrarEstado("Pista " + (indice + 1)
                 + ": pesos de izquierda a derecha, de 128 a 1.");
+    }
+
+    private void guardarResultado() {
+        if (resultadoGuardado) {
+            return;
+        }
+        String nombre = ventana.getPanelResultado().getNombreIngresado();
+        if (nombre == null || nombre.trim().isEmpty()) {
+            ventana.getPanelResultado().mostrarError(
+                    "Escribe tu nombre antes de guardar."
+            );
+            return;
+        }
+
+        try {
+            repositorioPuntuaciones.registrarResultado(
+                    new ResultadoTetris(nombre, juego.getPuntuacion())
+            );
+            resultadoGuardado = true;
+            ventana.getPanelResultado().setEdicionHabilitada(false);
+            ventana.getPanelResultado().mostrarConfirmacion(
+                    "Puntuación guardada en calificaciones.csv."
+            );
+        } catch (java.io.IOException | IllegalStateException e) {
+            ventana.getPanelResultado().mostrarError(
+                    "No se pudo guardar la puntuación: " + e.getMessage()
+            );
+        }
     }
 
     private void actualizarFilaActiva() {

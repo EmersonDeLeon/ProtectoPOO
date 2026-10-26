@@ -21,6 +21,9 @@ public class FilaVista extends JPanel {
 
     private final JLabel[] casillas = new JLabel[8];
 
+    private final JPanel informacion =
+        new JPanel(new GridLayout(2, 1));
+
     private final JLabel etiquetaObjetivo =
             new JLabel("", SwingConstants.CENTER);
 
@@ -47,7 +50,7 @@ public class FilaVista extends JPanel {
 
         add(filaBits, BorderLayout.CENTER);
 
-        JPanel informacion = new JPanel(new GridLayout(2, 1));
+        
         informacion.setPreferredSize(
                 new Dimension(ANCHO_OBJETIVO, 55)
         );
@@ -60,8 +63,6 @@ public class FilaVista extends JPanel {
 
         informacion.add(etiquetaObjetivo);
         informacion.add(etiquetaEstado);
-
-        add(informacion, BorderLayout.EAST);
 
         mostrarObjetivo(objetivo);
         actualizarApariencia();
@@ -130,5 +131,9 @@ public class FilaVista extends JPanel {
         etiquetaEstado.setForeground(
                 infectada ? new Color(160, 0, 0) : Color.BLACK
         );
+    }
+
+    public JPanel getPanelObjetivo() {
+    return informacion;
     }
 }

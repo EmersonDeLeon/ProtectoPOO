@@ -1,6 +1,5 @@
-package app;
-
 import controller.GestorPantallas;
+import controller.RankingController;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -11,6 +10,8 @@ import repositorio.RepositorioPuntuaciones;
 import repositorio.RepositorioUsuarios;
 import view.Fuentes;
 import view.VentanaPrincipal;
+import controller.tetrisController;
+import modelo.JuegoTetrisBinario;
 
 public class Aplicacion {
 
@@ -19,6 +20,7 @@ public class Aplicacion {
     private final RepositorioPuntuaciones repositorioPuntuaciones;
 
     private GestorPantallas gestorPantallas;
+    private RankingController rankingController;
     private VentanaPrincipal ventanaPrincipal;
 
     public Aplicacion() {
@@ -63,9 +65,20 @@ public class Aplicacion {
         });
 
         gestorPantallas = new GestorPantallas(
-                ventanaPrincipal,
-                repositorioUsuarios
+        ventanaPrincipal,
+        repositorioUsuarios
         );
+        rankingController = new RankingController(
+                repositorioPuntuaciones,
+                ventanaPrincipal,
+                gestorPantallas
+        );
+
+        JuegoTetrisBinario juego = new JuegoTetrisBinario();
+        new tetrisController(juego, ventanaPrincipal, repositorioPuntuaciones);
+
+        gestorPantallas.mostrarMenu();
+        ventanaPrincipal.setVisible(true);
         gestorPantallas.mostrarMenu();
         ventanaPrincipal.setVisible(true);
     }
