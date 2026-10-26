@@ -7,13 +7,13 @@ import modelo.Credito;
 import view.PanelCreditos;
 import view.VentanaPrincipal;
 
-public class creditosController {
+public class CreditosController {
 
     private final GestorPantallas gestorPantallas;
     private final PanelCreditos panel;
     private final List<Credito> creditos;
 
-    public creditosController(
+    public CreditosController(
             VentanaPrincipal ventanaPrincipal,
             GestorPantallas gestorPantallas
     ) {

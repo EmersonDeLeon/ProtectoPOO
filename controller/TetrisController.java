@@ -13,7 +13,7 @@ import repositorio.RepositorioPuntuaciones;
 import view.PanelJuego;
 import view.VentanaPrincipal;
 
-public class tetrisController {
+public class TetrisController {
 
     private static final int INTERVALO_ANIMACION_MS = 30;
     private static final int DURACION_CAIDA_MS = 3500;
@@ -31,7 +31,7 @@ public class tetrisController {
     private boolean partidaActiva;
     private boolean resultadoGuardado;
 
-    public tetrisController(
+    public TetrisController(
             JuegoTetrisBinario juego,
             VentanaPrincipal ventana
     ) {
@@ -200,7 +200,10 @@ public class tetrisController {
                 partidaActiva = false;
                 detenerTemporizadores();
                 panel.ocultarBloque();
+<<<<<<< HEAD:controller/tetrisController.java
                 resultadoGuardado = false;
+=======
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661:controller/TetrisController.java
                 ventana.mostrarResultado(juego.getPuntuacion());
                 break;
             default:

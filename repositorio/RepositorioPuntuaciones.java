@@ -1,19 +1,31 @@
 package repositorio;
 
+<<<<<<< HEAD
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+=======
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+<<<<<<< HEAD
+=======
+import java.time.format.DateTimeParseException;
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import modelo.ResultadoTetris;
 
+<<<<<<< HEAD
 /** Guarda y consulta las calificaciones del juego en formato CSV. */
 public class RepositorioPuntuaciones {
 
@@ -23,12 +35,23 @@ public class RepositorioPuntuaciones {
             Comparator.comparingInt(ResultadoTetris::getPuntuacion)
                     .reversed()
                     .thenComparing(ResultadoTetris::getFecha);
+=======
+public class RepositorioPuntuaciones {
+
+    private static final int MARCA_ARCHIVO = 0x54545253;
+    private static final int VERSION_ARCHIVO = 1;
+    private static final int MAX_RESULTADOS = 100000;
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661
 
     private final Path rutaArchivo;
     private List<ResultadoTetris> resultados = new ArrayList<>();
 
     public RepositorioPuntuaciones() {
+<<<<<<< HEAD
         this(Paths.get("datos", "calificaciones.csv"));
+=======
+        this(Paths.get("datos", "puntuaciones.dat"));
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661
     }
 
     public RepositorioPuntuaciones(Path rutaArchivo) {
@@ -46,6 +69,7 @@ public class RepositorioPuntuaciones {
             return;
         }
 
+<<<<<<< HEAD
         List<List<String>> registros = parsearCsv(
                 new String(Files.readAllBytes(rutaArchivo), StandardCharsets.UTF_8)
         );
@@ -86,6 +110,63 @@ public class RepositorioPuntuaciones {
     }
 
     /** Guarda los resultados actuales en el archivo CSV. */
+=======
+        List<ResultadoTetris> cargados = new ArrayList<>();
+        try (DataInputStream entrada = new DataInputStream(
+                Files.newInputStream(rutaArchivo))) {
+            int marca = entrada.readInt();
+            int version = entrada.readInt();
+            int cantidad = entrada.readInt();
+
+            if (marca != MARCA_ARCHIVO) {
+                throw new IOException("El archivo de puntuaciones no es válido.");
+            }
+            if (version != VERSION_ARCHIVO) {
+                throw new IOException(
+                        "Versión de puntuaciones no compatible: " + version
+                );
+            }
+            if (cantidad < 0 || cantidad > MAX_RESULTADOS) {
+                throw new IOException(
+                        "La cantidad de resultados guardada no es válida."
+                );
+            }
+
+            for (int i = 0; i < cantidad; i++) {
+                String nombre = entrada.readUTF();
+                int puntuacion = entrada.readInt();
+                String fechaTexto = entrada.readUTF();
+
+                try {
+                    LocalDateTime fecha = LocalDateTime.parse(fechaTexto);
+                    cargados.add(
+                            new ResultadoTetris(nombre, puntuacion, fecha)
+                    );
+                } catch (DateTimeParseException | IllegalArgumentException e) {
+                    throw new IOException(
+                            "El resultado número " + (i + 1)
+                            + " contiene datos inválidos.",
+                            e
+                    );
+                }
+            }
+
+            if (entrada.read() != -1) {
+                throw new IOException(
+                        "El archivo contiene datos adicionales inesperados."
+                );
+            }
+        } catch (EOFException e) {
+            throw new IOException(
+                    "El archivo de puntuaciones está incompleto.", e
+            );
+        }
+
+        resultados = cargados;
+    }
+
+    /** Guarda los resultados actuales en el archivo local. */
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661
     public void guardar() throws IOException {
         guardarLista(resultados);
     }
@@ -105,13 +186,22 @@ public class RepositorioPuntuaciones {
 
         List<ResultadoTetris> actualizados = new ArrayList<>(resultados);
         actualizados.add(resultado);
+<<<<<<< HEAD
         actualizados.sort(ORDEN_PUNTAJE);
+=======
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661
         guardarLista(actualizados);
         resultados = actualizados;
     }
 
     public List<ResultadoTetris> obtenerResultados() {
+<<<<<<< HEAD
         return Collections.unmodifiableList(new ArrayList<>(resultados));
+=======
+        return Collections.unmodifiableList(
+                new ArrayList<>(resultados)
+        );
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661
     }
 
     public List<ResultadoTetris> obtenerRanking(int limite) {
@@ -122,7 +212,16 @@ public class RepositorioPuntuaciones {
         }
 
         List<ResultadoTetris> ordenados = new ArrayList<>(resultados);
+<<<<<<< HEAD
         ordenados.sort(ORDEN_PUNTAJE);
+=======
+        ordenados.sort(
+                Comparator.comparingInt(ResultadoTetris::getPuntuacion)
+                        .reversed()
+                        .thenComparing(ResultadoTetris::getFecha)
+        );
+
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661
         if (ordenados.size() > limite) {
             ordenados = new ArrayList<>(ordenados.subList(0, limite));
         }
@@ -139,6 +238,7 @@ public class RepositorioPuntuaciones {
         if (carpeta != null) {
             Files.createDirectories(carpeta);
         }
+<<<<<<< HEAD
         Path temporal = Files.createTempFile(carpeta, "calificaciones-", ".tmp");
 
         List<ResultadoTetris> ordenados = new ArrayList<>(datos);
@@ -159,11 +259,47 @@ public class RepositorioPuntuaciones {
             } catch (AtomicMoveNotSupportedException e) {
                 Files.move(temporal, rutaArchivo,
                         StandardCopyOption.REPLACE_EXISTING);
+=======
+
+        Path baseTemporal = carpeta == null ? Paths.get(".") : carpeta;
+        Path temporal = Files.createTempFile(
+                baseTemporal, "puntuaciones-", ".tmp"
+        );
+
+        try {
+            try (DataOutputStream salida = new DataOutputStream(
+                    Files.newOutputStream(temporal))) {
+                salida.writeInt(MARCA_ARCHIVO);
+                salida.writeInt(VERSION_ARCHIVO);
+                salida.writeInt(datos.size());
+
+                for (ResultadoTetris resultado : datos) {
+                    salida.writeUTF(resultado.getNombreJugador());
+                    salida.writeInt(resultado.getPuntuacion());
+                    salida.writeUTF(resultado.getFecha().toString());
+                }
+            }
+
+            try {
+                Files.move(
+                        temporal,
+                        rutaArchivo,
+                        StandardCopyOption.REPLACE_EXISTING,
+                        StandardCopyOption.ATOMIC_MOVE
+                );
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(
+                        temporal,
+                        rutaArchivo,
+                        StandardCopyOption.REPLACE_EXISTING
+                );
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661
             }
         } finally {
             Files.deleteIfExists(temporal);
         }
     }
+<<<<<<< HEAD
 
     private static String escaparCsv(String valor) {
         return "\"" + valor.replace("\"", "\"\"") + "\"";
@@ -245,4 +381,6 @@ public class RepositorioPuntuaciones {
         }
         return registros;
     }
+=======
+>>>>>>> f40dc91d0fe34d72c02c74f3110bd5b2c8b64661
 }
