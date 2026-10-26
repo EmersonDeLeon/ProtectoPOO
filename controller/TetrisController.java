@@ -221,17 +221,25 @@ public class TetrisController {
             prepararSiguienteBloque();
         } else if (juego.getEstado()
                 == JuegoTetrisBinario.Estado.ESPERANDO_RESOLUCION) {
+            int cantidadFilasAntes = juego.getTablero().getCantidadFilas();
             boolean terminado = juego.resolverFila();
             if (terminado) {
                 partidaActiva = false;
                 panel.ocultarBloque();
                 resultadoGuardado = false;
                 ventana.mostrarResultado(juego.getPuntuacion());
-            } else {
+            } else if (juego.getTablero().getCantidadFilas() < cantidadFilasAntes) {
                 panel.retirarFilaActiva();
                 actualizarFilaActiva();
                 panel.mostrarInfeccion(false);
                 panel.mostrarEstado("Fila recuperada. Continúa la partida.");
+                prepararSiguienteBloque();
+            } else {
+                FilaBinaria nueva = juego.getTablero().getFilaActiva();
+                panel.reiniciarFilas(nueva.getObjetivo());
+                actualizarFilaActiva();
+                panel.mostrarInfeccion(false);
+                panel.mostrarEstado("¡Tablero despejado! Continúa la partida.");
                 prepararSiguienteBloque();
             }
         } else if (juego.getEstado() == JuegoTetrisBinario.Estado.EN_CURSO) {

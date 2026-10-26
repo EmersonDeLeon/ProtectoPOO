@@ -58,7 +58,6 @@ public class JuegoTetrisBinario {
         boolean correcta = tablero.colocarUno(columna);
         
         if (!correcta) {
-        // Incluye las filas inactivas y la que acaba de fallar.
             if (tablero.getCantidadFilas() >= 10) {
                 estado = Estado.TERMINADO;
                 return ResultadoCaida.PARTIDA_TERMINADA;
@@ -88,8 +87,11 @@ public class JuegoTetrisBinario {
     public boolean resolverFila() {
         exigirEstado(Estado.ESPERANDO_RESOLUCION);
         boolean partidaTerminada = tablero.resolverFilaActiva();
-        estado = partidaTerminada ? Estado.TERMINADO : Estado.EN_CURSO;
-        return partidaTerminada;
+        if (partidaTerminada) {
+            tablero.reiniciar(generador.generar());
+        }
+        estado = Estado.EN_CURSO;
+        return false;
     }
 
     public boolean usarPista(int indice) {
