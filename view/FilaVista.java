@@ -120,6 +120,12 @@ public class FilaVista extends JPanel {
             casilla.setBorder(
                     BorderFactory.createLineBorder(borde, 2)
             );
+            // Aplicar al objetivo el mismo fondo de la fila.
+            informacion.setOpaque(true);
+            informacion.setBackground(fondo);
+
+            etiquetaObjetivo.setOpaque(true);
+            etiquetaObjetivo.setBackground(fondo);
         }
 
         etiquetaEstado.setText(

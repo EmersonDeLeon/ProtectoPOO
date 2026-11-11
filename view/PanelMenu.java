@@ -10,13 +10,14 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.JOptionPane;
 
 public class PanelMenu extends JPanel {
 
     private final JButton botonJugar = new JButton("Jugar");
-    private final JButton botonPuntuaciones =
-            new JButton("Puntuaciones");
+    private final JButton botonPuntuaciones = new JButton("Puntuaciones");
     private final JButton botonCreditos = new JButton("Créditos");
+    private final JButton botonInstrucciones = new JButton("Instrucciones");
 
     public PanelMenu() {
         setLayout(new GridBagLayout());
@@ -38,12 +39,13 @@ public class PanelMenu extends JPanel {
         contenido.add(titulo, BorderLayout.NORTH);
 
         JPanel opciones = new JPanel(
-                new GridLayout(3, 1, 0, 15)
+                new GridLayout(4, 1, 0, 15)
         );
         opciones.setOpaque(false);
 
         JButton[] botones = {
             botonJugar,
+            botonInstrucciones,
             botonPuntuaciones,
             botonCreditos
         };
@@ -67,11 +69,12 @@ public class PanelMenu extends JPanel {
         contenido.add(opciones, BorderLayout.CENTER);
 
         JPanel instrucciones = new JPanel(
-                new GridLayout(3, 1, 0, 12)
+                new GridLayout(4, 1, 0, 12)
         );
         instrucciones.setOpaque(false);
 
         String[] textos = {
+            "CONTROLES:",
             "<  Izquierda",
             ">  Derecha",
             "SPACE  Soltar"
@@ -86,6 +89,11 @@ public class PanelMenu extends JPanel {
             etiqueta.setForeground(Color.BLACK);
             instrucciones.add(etiqueta);
         }
+        botonInstrucciones.addActionListener(
+        e -> mostrarInstrucciones()
+        );
+
+        
 
         contenido.add(instrucciones, BorderLayout.SOUTH);
 
@@ -103,4 +111,13 @@ public class PanelMenu extends JPanel {
     public JButton getBotonCreditos() {
         return botonCreditos;
     }
+
+    private void mostrarInstrucciones() {
+    JOptionPane.showMessageDialog(
+            this,
+            new PanelInstrucciones(),
+            "Instrucciones de Tetris binario",
+            JOptionPane.PLAIN_MESSAGE
+    );
+}
 }
